@@ -1,0 +1,1 @@
+# xtendcash-cryptonote-nodejs-pool
