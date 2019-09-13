@@ -1,1 +1,74 @@
 /* Insert your pool's unique CSS here */
+/* The switch - the box around the slider */
+/* Toggle Switch Begin */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 45px;
+  height: 25px;
+  margin: 0px 0 -5px 0px;
+}
+.switch input {
+  display:none;
+}
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #62707f;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+.switch-slider:before {
+  position: absolute;
+  font: normal normal normal 14px/1 FontAwesome;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  content: "\f185";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  font-size: 11px;
+  line-height: 19px;
+  color: #86af49;
+  text-indent: 3px;
+  background-color: #fff;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+input:checked + .switch-slider {
+  background-color: #8498ac;
+}
+input:focus + .switch-slider {
+  box-shadow: 0 0 1px #ccc;
+}
+input:checked + .switch-slider:before {
+  -webkit-transform: translateX(19px);
+  -ms-transform: translateX(19px);
+  transform: translateX(19px);
+  content: "\f186";
+  line-height: 19px;
+  color: #fff;
+  background-color: #555;
+  text-indent: 4px;
+}
+.switch-slider.round {
+  border-radius: 34px;
+}
+.switch-slider.round:before {
+  border-radius: 50%;
+}
+@-moz-document url-prefix() {
+  .switch-slider:before {
+    line-height: 18px;
+  }
+  input:checked + .switch-slider:before {
+    line-height: 18px;
+  }
+}
+/* Toggle Switch End */

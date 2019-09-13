@@ -78,8 +78,8 @@
 
 <!-- Javascript -->
 <script>
-// Hide blocks chart on load
-$('#blocksChart').hide();
+// Show blocks chart on load
+$('#blocksChart').show();
 
 // Update current page
 currentPage = {
@@ -190,11 +190,15 @@ function parseBlock(height, serializedBlock){
         time: parts[1],
         difficulty: parseInt(parts[2]),
         shares: parseInt(parts[3]),
-        orphaned: parts[4],
+        orphaned: parts[4].toString(),
         reward: parts[5]
     };
 
     var toGo = lastStats.config.depth - (lastStats.network.height - block.height) + 1;
+
+    if(!block.reward && toGo > 0)
+        block.orphaned='2';
+
     if(toGo > 1){
         block.maturity = toGo + ' to go';
     } 
@@ -246,7 +250,7 @@ function getBlockRowElement(block, jsonString){
         reward = "Waiting...";
     }
     else{
-        reward = getReadableCoins(block.reward, null, true);
+        reward = getReadableCoinsFixedDecimal(block.reward, null, true);
     }
     
     var columns =

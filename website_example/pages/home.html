@@ -2,7 +2,6 @@
 
 <!-- Statistics -->
 <div id="poolStats" class="row">
-
     <!-- Pool Hash Rate -->
     <div class="col-lg-3 col-sm-4">
         <div class="infoBox hoverExpandEffect">
@@ -10,7 +9,7 @@
                 <span class="fa fa-dashboard"></span>
             </div>
             <div class="content">
-                <div class="text"><span tkey="poolHashrate">Pool Hash Rate</span></div>
+                <div class="text"><span tkey="poolHashrate">Pool Graph Rate</span></div>
                 <div class="value"><span id="poolHashrate">N/A</span> <span class="smallText">(<span id="hashPower">0%</span>)</span></div>
             </div>
         </div>
@@ -62,7 +61,7 @@
                 <span class="fa fa-dashboard"></span>
             </div>
             <div class="content">
-                <div class="text"><span tkey="networkHashrate">Network Hash Rate</span></div>
+                <div class="text"><span tkey="networkHashrate">Network Graph Rate</span></div>
                 <div class="value"><span id="networkHashrate">N/A</span></div>
             </div>
         </div>
@@ -98,7 +97,7 @@
     <div class="col-lg-3 col-sm-4">
         <div class="infoBox hoverExpandEffect">
             <div class="icon">
-                <span class="fa fa-dollar"></span>
+                <span class="fa fa-money"></span>
             </div>
             <div class="content">
                 <div class="text"><span tkey="networkLastReward">Last Reward</span></div>
@@ -124,7 +123,7 @@
     <div class="col-lg-3 col-sm-4">
         <div class="infoBox hoverExpandEffect">
             <div class="icon">
-                <span class="fa fa-dollar"></span>
+                <span class="fa fa-percent"></span>
             </div>
             <div class="content">
                 <div class="text"><span tkey="poolFee">Pool Fee</span></div>
@@ -137,11 +136,11 @@
     <div class="col-lg-3 col-sm-4">
         <div class="infoBox hoverExpandEffect">
             <div class="icon">
-                <span class="fa fa-dollar"></span>
+                <span class="fa fa-usd"></span>
             </div>
             <div class="content">
                 <div class="text"><span tkey="paymentsMinimum">Minimum Payout</span></div>
-                <div class="value"><span id="paymentsMinimum">N/A</span></div>
+                <div class="value"><span id="paymentsMinimum">N/A</span> <span class="smallText">(<strong><span id="paymentsExchangeMinimum">N/A</span></strong> <span tkey="exchangeWallet">for integrated address</span>)</span></div>
             </div>
         </div>
     </div>
@@ -176,7 +175,7 @@
 <div class="row">
     <div class="col-sm-6 poolChart">
         <div class="card">
-            <h4><span tkey="hashRate">Hash Rate</span></h4>
+            <h4><span tkey="hashRate">Graph Rate</span></h4>
             <div class="chart">
                 <canvas id="chart_hashrate"></canvas>
                 <a class="chart-style"></a>
@@ -230,22 +229,22 @@ currentPage = {
     update: function(){
         $('#networkLastBlockFound').timeago('update', new Date(lastStats.lastblock.timestamp * 1000).toISOString());
         
-        updateText('networkHashrate', getReadableHashRateString(lastStats.network.difficulty / lastStats.config.coinDifficultyTarget) + '/sec');
+        updateText('networkHashrate', getReadableHashRateString(lastStats.network.difficulty / lastStats.config.coinDifficultyTarget * 32) + '/sec');
         updateText('networkDifficulty', formatNumber(lastStats.network.difficulty.toString(), ' '));
         updateText('blockchainHeight', formatNumber(lastStats.network.height.toString(), ' '));
         updateText('lastHash', lastStats.lastblock.hash).setAttribute('href', getBlockchainUrl(lastStats.lastblock.hash));
 
         if (lastStats.config.networkFee) {
             var networkFeePercent = lastStats.config.networkFee / 100;
-            updateText('networkLastReward', getReadableCoins(lastStats.lastblock.reward - (lastStats.lastblock.reward * networkFeePercent)));
+            updateText('networkLastReward', getReadableCoinsFixedDecimal(lastStats.lastblock.reward - (lastStats.lastblock.reward * networkFeePercent)));
         } else {
-            updateText('networkLastReward', getReadableCoins(lastStats.lastblock.reward));
+            updateText('networkLastReward', getReadableCoinsFixedDecimal(lastStats.lastblock.reward));
         }
 
         updateText('poolHashrate', getReadableHashRateString(lastStats.pool.hashrate) + '/sec');
         updateText('blocksTotal', lastStats.pool.totalBlocks.toString());
         
-        var hashPower = lastStats.pool.hashrate / (lastStats.network.difficulty / lastStats.config.coinDifficultyTarget) * 100;
+        var hashPower = lastStats.pool.hashrate / (lastStats.network.difficulty / lastStats.config.coinDifficultyTarget * 32) * 100;
         updateText('hashPower', hashPower.toFixed(2) + '%');
 
         if (lastStats.pool.lastBlockFound) {
@@ -271,8 +270,8 @@ currentPage = {
 
         updateText('paymentsInterval', getReadableTime(lastStats.config.paymentsInterval));
         updateText('paymentsMinimum', getReadableCoins(lastStats.config.minPaymentThreshold));
-
-        updateText('blockSolvedTime', getReadableTime(lastStats.network.difficulty / lastStats.pool.hashrate));
+        updateText('paymentsExchangeMinimum', getReadableCoinsFixedDecimal(lastStats.config.minPaymentExchangeThreshold, 1, true));
+        updateText('blockSolvedTime', getReadableTime(lastStats.network.difficulty / lastStats.pool.hashrate * 32));
         updateText('currentEffort', (lastStats.pool.roundHashes / lastStats.network.difficulty * 100).toFixed(1) + '%');
 
         if (lastStats.charts && !chartsInitialized) {
@@ -324,6 +323,7 @@ function createCharts() {
                         data: graphData[graphType].values,
                         dataType: graphType,
                         fill: true,
+                        pointStyle: 'star',
                         backgroundColor: bgcolor,
                         borderColor: bordercolor,
                         borderWidth: borderwidth
@@ -334,7 +334,7 @@ function createCharts() {
                     responsive: true,
                     maintainAspectRatio: false,
                     legend: { display: false },
-                    elements: { point: { radius: 0, hitRadius: 10, hoverRadius: 5 } },
+                    elements: { point: { radius: 1, hitRadius: 10, hoverRadius: 5 } },
                     scales: {
                         xAxes: [{
                             display: false,
@@ -357,6 +357,8 @@ function createCharts() {
                         padding: { top: 5, left: 10, right: 10, bottom: 10 }
                     },
                     tooltips: {
+                        intersect: false,
+                        mode: 'index',
                         callbacks: {
                             label: function(tooltipItem, data) {
                                 var dataType = data.datasets[tooltipItem.datasetIndex].dataType || '';

@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
 
-    <title>Cryptonote Mining Pool</title>
+    <title>Swap Mining Pool</title>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.6.3/jquery.timeago.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <link href="themes/default.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <link rel="icon" type="image/png" href="icon-32.png">
     <link href="themes/custom.css" rel="stylesheet">
 </head>
 <body>
@@ -59,6 +60,10 @@
                     <i class="fa fa-gears"></i> <span tkey="settings">Settings</span>
                 </a></li>
 
+                <li><a class="hot_link" data-page="wallet.html" href="#wallet">
+                    <i class="fa fa-address-card"></i> <span tkey="paperwallet">Paper Wallet</span>
+                </a></li>
+				
                 <li><a class="hot_link" data-page="faq.html" href="#faq">
                     <i class="fa fa-comments"></i> <span tkey="faq">FAQ</span>
                 </a></li>
@@ -74,7 +79,11 @@
         <div id="section"><span tkey="pool">Pool</span>: <strong><span id="g_poolHashrate"><span tkey="na">N/A</span></span></strong></div>
         <div id="section"><span tkey="you">You</span>: <strong><span id="g_userHashrate"><span tkey="na">N/A</span></span></strong></div>
         <div id="section"><span id="statsUpdated"><span tkey="statsUpdated">Stats Updated</span> &nbsp;<i class="fa fa-bolt"></i></span></div>
-	<div id="langSelector"></div>
+        <label class="switch">
+            <input class="switch-checkbox" type="checkbox" value=true />
+            <span class="switch-slider round"></span>
+        </label>
+        <div id="langSelector"></div>
     </div>
     
     <!-- Page content -->
@@ -84,15 +93,6 @@
     </div>
     
 </div>
-
-<!-- Footer -->
-<footer>
-    <div class="text-muted">
-        <span tkey="poweredBy">Powered by</span> <a target="_blank" href="https://github.com/dvandal/cryptonote-nodejs-pool"><i class="fa fa-github"></i> cryptonote-nodejs-pool</a>
-        <span id="poolVersion"></span>
-        <span class="hidden-xs"><span tkey="openSource">open sourced under the</span> <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL</a></span>
-    </div>
-</footer>
 
 <!-- Javascript -->
 <script src="config.js"></script>
@@ -135,7 +135,7 @@ function updateLiveStats(data) {
 // Update global informations
 function updateIndex(){
     updateText('coinSymbol', lastStats.config.symbol);
-    updateText('g_networkHashrate', getReadableHashRateString(lastStats.network.difficulty / lastStats.config.coinDifficultyTarget) + '/sec');
+    updateText('g_networkHashrate', getReadableHashRateString(lastStats.network.difficulty / lastStats.config.coinDifficultyTarget * 32) + '/sec');
     updateText('g_poolHashrate', getReadableHashRateString(lastStats.pool.hashrate) + '/sec');    
     if (lastStats.miner && lastStats.miner.hashrate){
          updateText('g_userHashrate', getReadableHashRateString(lastStats.miner.hashrate) + '/sec');
@@ -182,17 +182,12 @@ function fetchLiveStats() {
 
 // Initialize
 $(function(){
-    // Load current theme if not default
-    if (themeCss && themeCss != 'themes/default.css') {
-        $("head").append("<link rel='stylesheet' href=" + themeCss + ">");
-    }
-    
     // Add support informations to menu    
     if (typeof telegram !== 'undefined' && telegram) {
         $('#menu-content').append('<li><a target="_new" href="'+telegram+'"><i class="fa fa-telegram"></i> <span tkey="telegram">Telegram group</span></a></li>');
     }
     if (typeof discord !== 'undefined' && discord) {
-        $('#menu-content').append('<li><a target="_new" href="'+discord+'"><i class="fa fa-ticket"></i> <span tkey="discord">Discord</span></a></li>');
+        $('#menu-content').append('<li><a target="_new" href="'+discord+'"><i class="fab fa-discord"></i> <span tkey="discord">Discord</span></a></li>');
     }
     if (typeof email !== 'undefined' && email) {
         $('#menu-content').append('<li><a target="_new" href="mailto:'+email+'"><i class="fa fa-envelope"></i> <span tkey="contactUs">Contact Us</span></a></li>');

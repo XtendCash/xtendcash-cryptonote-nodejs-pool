@@ -202,7 +202,7 @@ function getReadableHashRateString(hashrate){
     if (!hashrate) hashrate = 0;
 
     var i = 0;
-    var byteUnits = [' H', ' kH', ' MH', ' GH', ' TH', ' PH' ];
+    var byteUnits = [' G', ' kG', ' MG', ' GG', ' TG', ' PG' ];
     if (hashrate > 0) {
         while (hashrate > 1000){
             hashrate = hashrate / 1000;
@@ -226,6 +226,13 @@ function getReadableCoins(coins, digits, withoutSymbol){
     return amount.toString() + (withoutSymbol ? '' : (' ' + lastStats.config.symbol));
 }
 
+// Get readable coins with fixed decimal places (no scientific notation or truncated decimals)
+function getReadableCoinsFixedDecimal(coins, digits, withoutSymbol){
+    var coinDecimalPlaces = getCoinDecimalPlaces();
+    var amount = parseFloat((parseInt(coins || 0) / lastStats.config.coinUnits));
+    return amount.toFixed(digits || coinDecimalPlaces).toString() + (withoutSymbol ? '' : (' ' + lastStats.config.symbol));
+}
+
 // Format payment link
 function formatPaymentLink(hash){
     return '<a target="_blank" href="' + getTransactionUrl(hash) + '">' + hash + '</a>';
@@ -239,10 +246,7 @@ function formatDifficulty(x) {
 // Format luck / current effort
 function formatLuck(difficulty, shares) {
     var percent = Math.round(shares / difficulty * 100);
-    if(!percent){
-        return '<span class="luckGood">?</span>';
-    }
-    else if(percent <= 100){
+    if(percent <= 100){
         return '<span class="luckGood">' + percent + '%</span>';
     }
     else if(percent >= 101 && percent <= 150){
