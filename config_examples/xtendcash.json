@@ -29,7 +29,7 @@
         "clusterForks": 2,
         "poolAddress": "*** ADDRESS HERE****",
         "intAddressPrefix": 759864,
-        "subAddressPrefix": 11368,
+        "subAddressPrefix": 1169976,
         "blockRefreshInterval": 50,
         "minerTimeout": 900,
         "sslCert": "./cert.pem",
